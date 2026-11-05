@@ -48,5 +48,14 @@
         "@deepseek-ai/dsh-client-ui-conversation"
       ]
     }
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/korotky/dsh-peak-cost.git"
+  },
+  "homepage": "https://github.com/korotky/dsh-peak-cost#readme",
+  "bugs": {
+    "url": "https://github.com/korotky/dsh-peak-cost/issues"
+  },
+  "author": "Oleg Korotkii"
 }
