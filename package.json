@@ -1,0 +1,52 @@
+{
+  "name": "dsh-peak-cost",
+  "version": "0.1.0",
+  "description": "DeepSeek peak-hour period and per-session token cost estimate in the Harness composer statistics row",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek",
+    "harness",
+    "cost",
+    "usage",
+    "pricing",
+    "peak-hours"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.1",
+    "node": ">=22.13"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}
