@@ -1,7 +1,7 @@
 {
   "name": "dsh-peak-cost",
   "version": "0.1.0",
-  "description": "DeepSeek peak-hour period and per-session token cost estimate in the Harness composer statistics row",
+  "description": "Peak billing period, countdown and per-session cost estimate in the DeepSeek Harness composer statistics row",
   "type": "module",
   "license": "MIT",
   "keywords": [
