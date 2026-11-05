@@ -1,0 +1,28 @@
+name: Ошибка
+description: Расчёт неверен, плагин не грузится, интерфейс ведёт себя странно
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Что произошло
+      description: Что вы ожидали и что получили
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Версия dsh и плагина
+      placeholder: dsh 0.2.1-rc.5, dsh-peak-cost 0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Диагностика из поповера
+      description: Строки «Хост», «Схема», «Запись настроек», «Календарь»
+  - type: textarea
+    id: expected
+    attributes:
+      label: Если расчёт расходится с платформой
+      description: Что показывает страница Usage и что показывает плагин

@@ -68,7 +68,7 @@ test('фаза не зависит от часового пояса процес
   const script = [
     "import { phaseAt } from './lib/calendar.js';",
     "const p = phaseAt(Date.parse('2026-11-05T02:00:00Z'));",
-    "process.stdout.write(p.phase);",
+    'process.stdout.write(p.phase);',
   ].join('\n');
   const dir = fileURLToPath(new URL('..', import.meta.url));
   const out = execFileSync(process.execPath, ['--input-type=module', '-e', script], {

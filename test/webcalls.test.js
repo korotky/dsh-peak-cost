@@ -58,18 +58,31 @@ test('разбивка web-вызовов по фазам: суммы фаз д�
   const peak = Date.parse('2026-11-06T02:00:00Z'); // пятница, пик
   const off = Date.parse('2026-11-06T04:30:00Z'); // пятница, off-peak
   const events = [
-    call('a', 'web_search', peak), result('a', peak),
-    call('b', 'web_fetch', off), result('b', off),
+    call('a', 'web_search', peak),
+    result('a', peak),
+    call('b', 'web_fetch', off),
+    result('b', off),
   ];
   const { amount, byPhase } = foldWebCalls(events, { currency: 'USD' });
   assert.equal(byPhase.peak.calls, 1);
   assert.equal(byPhase.offPeak.calls, 1);
-  assert.equal(Number((byPhase.peak.amount + byPhase.offPeak.amount).toFixed(6)), Number(amount.toFixed(6)));
+  assert.equal(
+    Number((byPhase.peak.amount + byPhase.offPeak.amount).toFixed(6)),
+    Number(amount.toFixed(6)),
+  );
 });
 
 test('мультизапросный поиск биллится по числу запросов', () => {
   const events = [
-    { type: 'tool/call', time: AFTER_BILLING, data: { callId: 'm', name: 'web_search', arguments: JSON.stringify({ queries: ['a', 'b', 'c'] }) } },
+    {
+      type: 'tool/call',
+      time: AFTER_BILLING,
+      data: {
+        callId: 'm',
+        name: 'web_search',
+        arguments: JSON.stringify({ queries: ['a', 'b', 'c'] }),
+      },
+    },
     result('m', AFTER_BILLING),
   ];
   const { calls, amount } = foldWebCalls(events, { currency: 'USD' });
@@ -79,7 +92,11 @@ test('мультизапросный поиск биллится по числу
 
 test('битые аргументы считаются одним вызовом', () => {
   const events = [
-    { type: 'tool/call', time: AFTER_BILLING, data: { callId: 'm', name: 'web_search', arguments: 'not json' } },
+    {
+      type: 'tool/call',
+      time: AFTER_BILLING,
+      data: { callId: 'm', name: 'web_search', arguments: 'not json' },
+    },
     result('m', AFTER_BILLING),
   ];
   const { calls } = foldWebCalls(events, { currency: 'USD' });

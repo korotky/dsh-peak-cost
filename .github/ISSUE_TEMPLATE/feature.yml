@@ -1,0 +1,22 @@
+name: Идея
+description: Чего не хватает
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу это решает
+      description: Опишите ситуацию, а не готовое решение
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Как это могло бы выглядеть
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Ограничения проекта
+      options:
+        - label: Без сетевых запросов и телеметрии (или с оффлайн-фолбэком)
+        - label: Без новых зависимостей, если можно обойтись

@@ -1,5 +1,9 @@
 # dsh-peak-cost
 
+[![CI](https://github.com/korotky/dsh-peak-cost/actions/workflows/ci.yml/badge.svg)](https://github.com/korotky/dsh-peak-cost/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/dsh-peak-cost.svg)](https://www.npmjs.com/package/dsh-peak-cost)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **You find out you worked at double rates when the bill arrives.** This plugin puts the billing period and the running cost into the composer statistics row, before you finish typing.
 
 DeepSeek charges twice as much during peak windows — weekdays, 01:00–04:00 and 06:00–10:00 UTC, excluding PRC public holidays — and the Harness UI shows nothing about it. This plugin closes that gap: the period, a countdown to the switch, and a cost estimate for the current session, in one control below the composer, with the details one click away.
@@ -17,11 +21,11 @@ The estimate is checked against the platform: 1,697 requests and 479.4M tokens f
 
 ## What it shows
 
-| | |
-|---|---|
-| Pill | `● Off-peak · 9 h 44 m · $1.20` — period, countdown, session estimate |
-| Popover | buckets with effective rates, subagents, today/week, peak vs off-peak, web call fees, applied price-table version, diagnostics |
-| Plugins page | currency, language, refresh interval, reminder interval, ledger scope, sidebar footer row, peak reminder |
+|              |                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Pill         | `● Off-peak · 9 h 44 m · $1.20` — period, countdown, session estimate                                                          |
+| Popover      | buckets with effective rates, subagents, today/week, peak vs off-peak, web call fees, applied price-table version, diagnostics |
+| Plugins page | currency, language, refresh interval, reminder interval, ledger scope, sidebar footer row, peak reminder                       |
 
 ## Install
 

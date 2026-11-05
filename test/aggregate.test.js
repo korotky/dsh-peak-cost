@@ -19,12 +19,10 @@ function messageEvent(secondsOffset = 0) {
   };
 }
 
-function fakeSource({ logs, trace, withoutTrace = false }) {
+function fakeSource({ logs, trace = null, withoutTrace = false }) {
   return {
     readSession: async (id) => logs[id],
-    traceSession: withoutTrace
-      ? undefined
-      : async () => trace ?? { descendants: [] },
+    traceSession: withoutTrace ? undefined : async () => trace ?? { descendants: [] },
   };
 }
 
@@ -43,7 +41,7 @@ test('унаследованный префикс не считается два
       sub: { events: [messageEvent(0), messageEvent(1), messageEvent(2)], inheritedEventCount: 2 },
     },
   });
-  const result = await collectCostEvents(source, 'sub', { rootId: 'sub' });
+  const result = await collectCostEvents(source, 'sub');
   assert.equal(result.events.length, 1);
 });
 
@@ -54,9 +52,7 @@ test('сабагент-сессии добавляются к сумме и сч
       child: { events: [messageEvent(1)], inheritedEventCount: 0 },
     },
     trace: {
-      descendants: [
-        { session: { header: { id: 'child', origin: 'subagent' } } },
-      ],
+      descendants: [{ session: { header: { id: 'child', origin: 'subagent' } } }],
     },
   });
   const result = await collectCostEvents(source, 'root');
@@ -76,9 +72,10 @@ test('вложенный сабагент учитывается один раз
     },
     trace: {
       descendants: [
-        { session: { header: { id: 'child', origin: 'subagent' } }, descendants: [
-          { session: { header: { id: 'grandchild', origin: 'subagent' } } },
-        ] },
+        {
+          session: { header: { id: 'child', origin: 'subagent' } },
+          descendants: [{ session: { header: { id: 'grandchild', origin: 'subagent' } } }],
+        },
       ],
     },
   });

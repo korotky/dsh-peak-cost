@@ -31,7 +31,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "typecheck": "tsc",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build": "node scripts/build.mjs",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "engines": {
     "dsh": ">=0.2.1-rc.1",
@@ -57,5 +62,11 @@
   "bugs": {
     "url": "https://github.com/korotky/dsh-peak-cost/issues"
   },
-  "author": "Oleg Korotkii"
+  "author": "Oleg Korotkii",
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
+  },
+  "packageManager": "npm@10.8.2"
 }

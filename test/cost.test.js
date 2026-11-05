@@ -22,14 +22,18 @@ const ONE_MILLION = {
 };
 
 test('cache-miss вход в пик стоит 0.30 USD за миллион у flash', () => {
-  const { amount, byBucket } = priceUsage(ONE_MILLION, 'deepseek-flash', PEAK_MOMENT, { currency: 'USD' });
+  const { amount, byBucket } = priceUsage(ONE_MILLION, 'deepseek-flash', PEAK_MOMENT, {
+    currency: 'USD',
+  });
   assert.equal(amount, 0.3);
   assert.equal(byBucket.cacheMiss, 0.3);
   assert.equal(byBucket.cacheHit, 0);
 });
 
 test('тот же вход в off-peak стоит вдвое дешевле', () => {
-  const { amount } = priceUsage(ONE_MILLION, 'deepseek-flash', OFF_PEAK_MOMENT, { currency: 'USD' });
+  const { amount } = priceUsage(ONE_MILLION, 'deepseek-flash', OFF_PEAK_MOMENT, {
+    currency: 'USD',
+  });
   assert.equal(amount, 0.15);
 });
 
@@ -58,7 +62,9 @@ test('deepseek-v4-pro считается по собственной табли�
 
 test('legacy-алиасы Flash считаются как Flash', () => {
   for (const model of ['deepseek-v4-flash', 'deepseek-v4-flash-vision-exp']) {
-    const { amount, unknownModel } = priceUsage(ONE_MILLION, model, PEAK_MOMENT, { currency: 'USD' });
+    const { amount, unknownModel } = priceUsage(ONE_MILLION, model, PEAK_MOMENT, {
+      currency: 'USD',
+    });
     assert.equal(amount, 0.3);
     assert.equal(unknownModel, undefined);
   }
@@ -70,7 +76,9 @@ test('CNY считается по своей таблице, без пересч
 });
 
 test('неизвестная модель не подменяется Flash-ценой', () => {
-  const { amount, unknownModel } = priceUsage(ONE_MILLION, 'some-future-model', PEAK_MOMENT, { currency: 'USD' });
+  const { amount, unknownModel } = priceUsage(ONE_MILLION, 'some-future-model', PEAK_MOMENT, {
+    currency: 'USD',
+  });
   assert.equal(amount, 0);
   assert.equal(unknownModel, 'some-future-model');
 });
@@ -89,8 +97,16 @@ test('момент до первой известной таблицы цен п
 
 test('свёртка событий суммирует запросы разных фаз по их собственным моментам', () => {
   const events = [
-    { type: 'assistant/message', time: PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
-    { type: 'assistant/message', time: OFF_PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
+    {
+      type: 'assistant/message',
+      time: PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
+    {
+      type: 'assistant/message',
+      time: OFF_PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
   ];
   const { total, requests } = foldCost(events, { currency: 'USD' });
   assert.equal(requests, 2);
@@ -99,7 +115,11 @@ test('свёртка событий суммирует запросы разны
 
 test('свёртка пропускает события без usage и без модели', () => {
   const events = [
-    { type: 'assistant/message', time: PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } } } },
+    {
+      type: 'assistant/message',
+      time: PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } } },
+    },
     { type: 'assistant/message', time: PEAK_MOMENT, data: { usage: ONE_MILLION } },
     { type: 'user/message', time: PEAK_MOMENT, data: {} },
   ];
@@ -110,8 +130,16 @@ test('свёртка пропускает события без usage и без 
 
 test('неизвестная модель в одном из запросов не обнуляет сумму остальных', () => {
   const events = [
-    { type: 'assistant/message', time: PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
-    { type: 'assistant/message', time: PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'future-model' } }, usage: ONE_MILLION } },
+    {
+      type: 'assistant/message',
+      time: PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
+    {
+      type: 'assistant/message',
+      time: PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'future-model' } }, usage: ONE_MILLION },
+    },
   ];
   const { total, unknownModels } = foldCost(events, { currency: 'USD' });
   assert.equal(total, 0.3);
@@ -126,8 +154,19 @@ test('реальное событие durable-лога ценится: моде�
     data: {
       turn: 1,
       step: 1,
-      message: { role: 'assistant', content: [], source: { kind: 'model', provider: 'deepseek-account', model: 'deepseek-flash' }, id: 'x' },
-      usage: { inputTokens: 5249, outputTokens: 623, cacheReadTokens: 8064, cacheWriteTokens: 0, totalTokens: 13936 },
+      message: {
+        role: 'assistant',
+        content: [],
+        source: { kind: 'model', provider: 'deepseek-account', model: 'deepseek-flash' },
+        id: 'x',
+      },
+      usage: {
+        inputTokens: 5249,
+        outputTokens: 623,
+        cacheReadTokens: 8064,
+        cacheWriteTokens: 0,
+        totalTokens: 13936,
+      },
     },
   };
   const { total, requests, byBucket, byBucketCost } = foldCost([realEvent], { currency: 'USD' });
@@ -144,9 +183,21 @@ test('реальное событие durable-лога ценится: моде�
 
 test('разбивка по фазам делит сумму на пик и off-peak', () => {
   const events = [
-    { type: 'assistant/message', time: PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
-    { type: 'assistant/message', time: OFF_PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
-    { type: 'assistant/message', time: OFF_PEAK_MOMENT + 60_000, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
+    {
+      type: 'assistant/message',
+      time: PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
+    {
+      type: 'assistant/message',
+      time: OFF_PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
+    {
+      type: 'assistant/message',
+      time: OFF_PEAK_MOMENT + 60_000,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
   ];
   const { total, byPhase } = foldCost(events, { currency: 'USD' });
   assert.equal(byPhase.peak.requests, 1);
@@ -158,7 +209,11 @@ test('разбивка по фазам делит сумму на пик и off-
 
 test('разбивка по фазам не создаёт пустых фаз', () => {
   const events = [
-    { type: 'assistant/message', time: OFF_PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
+    {
+      type: 'assistant/message',
+      time: OFF_PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
   ];
   const { byPhase } = foldCost(events, { currency: 'USD' });
   assert.equal(byPhase.peak.requests, 0);
@@ -167,8 +222,16 @@ test('разбивка по фазам не создаёт пустых фаз',
 
 test('свёртка умеет ограничивать период: события до since пропускаются', () => {
   const events = [
-    { type: 'assistant/message', time: PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
-    { type: 'assistant/message', time: OFF_PEAK_MOMENT, data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION } },
+    {
+      type: 'assistant/message',
+      time: PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
+    {
+      type: 'assistant/message',
+      time: OFF_PEAK_MOMENT,
+      data: { message: { source: { kind: 'model', model: 'deepseek-flash' } }, usage: ONE_MILLION },
+    },
   ];
   const { requests } = foldCost(events, { currency: 'USD', since: OFF_PEAK_MOMENT });
   assert.equal(requests, 1);

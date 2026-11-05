@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - name: Типы
+        run: npm run typecheck
+      - name: Форматирование
+        run: npm run format:check
+      - name: Тесты
+        run: npm test
+      - name: Сборка и проверка состава пакета
+        run: npm run build
+        if: matrix.node == 24
+      - name: Артефакт
+        if: matrix.node == 24
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-peak-cost-tarball
+          path: dist/*.tgz

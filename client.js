@@ -13,7 +13,13 @@ window.__ModuleLoader__.load({
     }
 
     const STATE_URL = '/api/dsh-peak-cost/state';
-    const DEFAULT_SETTINGS = { currency: 'USD', refreshMs: 30_000, lang: 'auto', footer: false, reminder: false };
+    const DEFAULT_SETTINGS = {
+      currency: 'USD',
+      refreshMs: 30_000,
+      lang: 'auto',
+      footer: false,
+      reminder: false,
+    };
 
     // Размер задаёт обёртка (как официальный `anchor`), кнопка повторяет его
     // через `font: inherit`. Иначе шорткат `font` перебивает font-size и пилюля
@@ -67,7 +73,12 @@ window.__ModuleLoader__.load({
       fontVariantNumeric: 'tabular-nums',
     };
 
-    const ROW_STYLE = { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '8px' };
+    const ROW_STYLE = {
+      display: 'flex',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      gap: '8px',
+    };
     const MUTED = { color: 'var(--dsw-alias-label-tertiary)' };
     const HAIRLINE = {
       height: '0.5px',
@@ -202,7 +213,10 @@ window.__ModuleLoader__.load({
 
     function activeLocale() {
       try {
-        const snapshot = localeFace && typeof localeFace.getSnapshot === 'function' ? localeFace.getSnapshot() : null;
+        const snapshot =
+          localeFace && typeof localeFace.getSnapshot === 'function'
+            ? localeFace.getSnapshot()
+            : null;
         return snapshot && typeof snapshot.active === 'string' ? snapshot.active : '';
       } catch {
         return '';
@@ -214,7 +228,11 @@ window.__ModuleLoader__.load({
     }
 
     function wordsFor(active) {
-      const lang = (active || (typeof navigator !== 'undefined' ? navigator.language : '') || '').toLowerCase();
+      const lang = (
+        active ||
+        (typeof navigator !== 'undefined' ? navigator.language : '') ||
+        ''
+      ).toLowerCase();
       return lang.startsWith('ru') ? RU : EN;
     }
 
@@ -315,14 +333,17 @@ window.__ModuleLoader__.load({
       const diag = state && state.diagnostics;
       if (!diag) return w.unknown;
       if (!diag.configSchema) return w.diagNoSchema;
-      const ns = (diag.namespaces || []).some((name) => name === 'peak-cost' || name === 'dsh-peak-cost');
+      const ns = (diag.namespaces || []).some(
+        (name) => name === 'peak-cost' || name === 'dsh-peak-cost',
+      );
       return `${diag.configSource || '?'} · ${ns ? w.diagNsOk : w.diagNsMissing}`;
     }
 
     function settingsText(state, w) {
       const diag = state && state.diagnostics;
       if (!diag) return w.unknown;
-      if (diag.settingsWritable === false) return `${w.diagWriteFailed}: ${diag.settingsError || '?'}`;
+      if (diag.settingsWritable === false)
+        return `${w.diagWriteFailed}: ${diag.settingsError || '?'}`;
       return w.diagOk;
     }
 
@@ -343,7 +364,9 @@ window.__ModuleLoader__.load({
             { style: { fontWeight: 500 } },
             known ? (offPeak ? w.offPeak : w.peak) : w.unknown,
           ),
-          known ? h('span', { style: MUTED }, `${w.until} ${localTime(state.nextChangeAt, w)}`) : null,
+          known
+            ? h('span', { style: MUTED }, `${w.until} ${localTime(state.nextChangeAt, w)}`)
+            : null,
         ),
         h(
           'div',
@@ -356,14 +379,26 @@ window.__ModuleLoader__.load({
               'div',
               { style: { ...ROW_STYLE, marginTop: '4px', fontSize: '15px', lineHeight: '20px' } },
               h('span', { title: w.estimate }, `≈ ${formatMoney(totals[currency], currency, w)}`),
-              h('span', { style: { ...MUTED, fontSize: '12px' } }, formatMoney(totals[currency === 'USD' ? 'CNY' : 'USD'], currency === 'USD' ? 'CNY' : 'USD', w)),
+              h(
+                'span',
+                { style: { ...MUTED, fontSize: '12px' } },
+                formatMoney(
+                  totals[currency === 'USD' ? 'CNY' : 'USD'],
+                  currency === 'USD' ? 'CNY' : 'USD',
+                  w,
+                ),
+              ),
             )
           : null,
         cost && cost.subagents && cost.subagents.sessions > 0
           ? h(
               'div',
               { style: { ...ROW_STYLE, ...MUTED, marginTop: '2px' } },
-              h('span', null, `${w.subagents}: ${cost.subagents.sessions} ${plural(cost.subagents.sessions, w.sessions, w)}`),
+              h(
+                'span',
+                null,
+                `${w.subagents}: ${cost.subagents.sessions} ${plural(cost.subagents.sessions, w.sessions, w)}`,
+              ),
               h('span', null, formatMoney(cost.subagents.totals[currency], currency, w)),
             )
           : null,
@@ -380,13 +415,21 @@ window.__ModuleLoader__.load({
                     'span',
                     { style: MUTED },
                     period === 'today' ? w.today : w.week,
-                    (state.settings && state.settings.scope === 'all' ? ` · ${w.scopeAll}` : ''),
+                    state.settings && state.settings.scope === 'all' ? ` · ${w.scopeAll}` : '',
                   ),
                   h(
                     'span',
                     { style: { display: 'inline-flex', gap: '10px', ...MUTED } },
-                    h('span', null, `${state.ledger[period].requests} ${plural(state.ledger[period].requests, w.requests, w)}`),
-                    h('span', { style: { color: 'var(--dsw-alias-label-secondary)' } }, formatMoney(state.ledger[period].totals[currency], currency, w)),
+                    h(
+                      'span',
+                      null,
+                      `${state.ledger[period].requests} ${plural(state.ledger[period].requests, w.requests, w)}`,
+                    ),
+                    h(
+                      'span',
+                      { style: { color: 'var(--dsw-alias-label-secondary)' } },
+                      formatMoney(state.ledger[period].totals[currency], currency, w),
+                    ),
                   ),
                 ),
               ),
@@ -400,7 +443,9 @@ window.__ModuleLoader__.load({
               h('span', null, formatMoney(cost.web.totals[currency], currency, w)),
             )
           : null,
-        cost && cost.byPhase && (cost.byPhase[currency].peak.requests > 0 || cost.byPhase[currency].offPeak.requests > 0)
+        cost &&
+          cost.byPhase &&
+          (cost.byPhase[currency].peak.requests > 0 || cost.byPhase[currency].offPeak.requests > 0)
           ? h(
               React.Fragment,
               null,
@@ -417,7 +462,11 @@ window.__ModuleLoader__.load({
                       'span',
                       { style: { display: 'inline-flex', gap: '10px', ...MUTED } },
                       h('span', null, `${row.requests} ${plural(row.requests, w.requests, w)}`),
-                      h('span', { style: { color: 'var(--dsw-alias-label-secondary)' } }, formatMoney(row.total, currency, w)),
+                      h(
+                        'span',
+                        { style: { color: 'var(--dsw-alias-label-secondary)' } },
+                        formatMoney(row.total, currency, w),
+                      ),
                     ),
                   );
                 }),
@@ -446,7 +495,11 @@ window.__ModuleLoader__.load({
                     { style: { display: 'inline-flex', gap: '10px', ...MUTED } },
                     h('span', null, formatTokens(tokens)),
                     h('span', null, formatRate(amount, tokens, currency)),
-                    h('span', { style: { color: 'var(--dsw-alias-label-secondary)' } }, formatMoney(amount, currency, w)),
+                    h(
+                      'span',
+                      { style: { color: 'var(--dsw-alias-label-secondary)' } },
+                      formatMoney(amount, currency, w),
+                    ),
                   ),
                 );
               }),
@@ -492,9 +545,15 @@ window.__ModuleLoader__.load({
         diagRow(w.diagHost, hostText(state, w)),
         diagRow(w.diagSchema, schemaText(state, w)),
         diagRow(w.diagSettings, settingsText(state, w)),
-        state && state.calendar ? diagRow(w.calendar, `${state.calendar.source} · ${state.calendar.holidays}`) : null,
+        state && state.calendar
+          ? diagRow(w.calendar, `${state.calendar.source} · ${state.calendar.holidays}`)
+          : null,
         state && state.capabilities && state.capabilities.length
-          ? h('div', { style: { ...MUTED, marginTop: '4px', fontSize: '11px' } }, `${w.caps}: ${state.capabilities.join(', ')}`)
+          ? h(
+              'div',
+              { style: { ...MUTED, marginTop: '4px', fontSize: '11px' } },
+              `${w.caps}: ${state.capabilities.join(', ')}`,
+            )
           : null,
         state && state.missing
           ? h(
@@ -525,7 +584,15 @@ window.__ModuleLoader__.load({
     function SettingsRow({ label, children }) {
       return h(
         'div',
-        { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '4px 0' } },
+        {
+          style: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            padding: '4px 0',
+          },
+        },
         h('span', { style: { fontSize: '12px' } }, label),
         children,
       );
@@ -639,7 +706,9 @@ window.__ModuleLoader__.load({
       }, []);
 
       const onWrite = async (patch) => {
-        setState((prev) => (prev ? { ...prev, settings: { ...(prev.settings || DEFAULT_SETTINGS), ...patch } } : prev));
+        setState((prev) =>
+          prev ? { ...prev, settings: { ...(prev.settings || DEFAULT_SETTINGS), ...patch } } : prev,
+        );
         try {
           const response = await fetch(STATE_URL, {
             method: 'POST',
@@ -648,13 +717,18 @@ window.__ModuleLoader__.load({
           });
           if (!response.ok) return;
           const data = await response.json();
-          if (data && data.settings) setState((prev) => (prev ? { ...prev, settings: data.settings } : prev));
+          if (data && data.settings)
+            setState((prev) => (prev ? { ...prev, settings: data.settings } : prev));
         } catch {
           // значение применится после перезагрузки
         }
       };
 
-      return h('div', { style: { marginTop: '8px' } }, h(SettingsControls, { w, settings, onWrite }));
+      return h(
+        'div',
+        { style: { marginTop: '8px' } },
+        h(SettingsControls, { w, settings, onWrite }),
+      );
     }
 
     // Строка в футере сайдбара: тот же запрос состояния, но компактнее.
@@ -692,7 +766,12 @@ window.__ModuleLoader__.load({
         { style: { display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px' } },
         h('span', {
           'aria-hidden': true,
-          style: { width: '6px', height: '6px', borderRadius: '50%', background: peak ? COLOURS.peak : COLOURS.offPeak },
+          style: {
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: peak ? COLOURS.peak : COLOURS.offPeak,
+          },
         }),
         known ? (peak ? w.footerPeak : w.footerOff) : w.unknown,
       );
@@ -822,8 +901,6 @@ window.__ModuleLoader__.load({
 
       const aria = [label, countdown, money].filter(Boolean).join(', ');
 
-
-
       const panel = h(Details, { state, w, currency: settings.currency, pos, onRecheck: reload });
 
       return h(
@@ -848,7 +925,11 @@ window.__ModuleLoader__.load({
             h('span', { 'aria-hidden': true, style: { ...DOT_STYLE, background: colour } }),
             h('span', null, label),
             notice
-              ? h('span', { style: { color: 'var(--dsw-alias-state-warn-primary)' } }, `· ${w.peakStarted}`)
+              ? h(
+                  'span',
+                  { style: { color: 'var(--dsw-alias-state-warn-primary)' } },
+                  `· ${w.peakStarted}`,
+                )
               : null,
             countdown
               ? h(

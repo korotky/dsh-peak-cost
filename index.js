@@ -27,11 +27,13 @@ import { selectLedgerSessions } from './lib/ledger.js';
  */
 function resolveAnchors() {
   const anchors = [[import.meta.url, 'self']];
-  if (process.env.DSH_PROFILE_DIR) anchors.push([`${process.env.DSH_PROFILE_DIR}/package.json`, 'env']);
+  if (process.env.DSH_PROFILE_DIR)
+    anchors.push([`${process.env.DSH_PROFILE_DIR}/package.json`, 'env']);
   if (process.argv[1]) anchors.push([process.argv[1], 'cli']);
   try {
     const profiles = join(homedir(), '.dsh', 'profiles');
-    for (const name of readdirSync(profiles)) anchors.push([join(profiles, name, 'package.json'), `profile:${name}`]);
+    for (const name of readdirSync(profiles))
+      anchors.push([join(profiles, name, 'package.json'), `profile:${name}`]);
   } catch {
     // каталога профилей нет — останутся предыдущие якоря
   }
@@ -62,13 +64,41 @@ function buildConfigSchema() {
   if (!schemaBuilder) return undefined;
   try {
     return schemaBuilder.object({
-      currency: schemaBuilder.union(['USD', 'CNY']).default('USD').volatile().description('Валюта в пилюле'),
-      refreshMs: schemaBuilder.union([15000, 30000, 60000]).default(30000).volatile().description('Период обновления, мс'),
-      lang: schemaBuilder.union(['auto', 'ru', 'en']).default('auto').volatile().description('Язык плагина'),
-      footer: schemaBuilder.boolean().default(false).volatile().description('Строка в футере сайдбара'),
-      reminder: schemaBuilder.boolean().default(false).volatile().description('Напоминание о входе в пик'),
-      reminderMinutes: schemaBuilder.number().default(30).volatile().description('Интервал напоминаний в пике, мин'),
-      scope: schemaBuilder.union(['workspace', 'all']).default('workspace').volatile().description('Область леджера: эта папка или все'),
+      currency: schemaBuilder
+        .union(['USD', 'CNY'])
+        .default('USD')
+        .volatile()
+        .description('Валюта в пилюле'),
+      refreshMs: schemaBuilder
+        .union([15000, 30000, 60000])
+        .default(30000)
+        .volatile()
+        .description('Период обновления, мс'),
+      lang: schemaBuilder
+        .union(['auto', 'ru', 'en'])
+        .default('auto')
+        .volatile()
+        .description('Язык плагина'),
+      footer: schemaBuilder
+        .boolean()
+        .default(false)
+        .volatile()
+        .description('Строка в футере сайдбара'),
+      reminder: schemaBuilder
+        .boolean()
+        .default(false)
+        .volatile()
+        .description('Напоминание о входе в пик'),
+      reminderMinutes: schemaBuilder
+        .number()
+        .default(30)
+        .volatile()
+        .description('Интервал напоминаний в пике, мин'),
+      scope: schemaBuilder
+        .union(['workspace', 'all'])
+        .default('workspace')
+        .volatile()
+        .description('Область леджера: эта папка или все'),
     });
   } catch {
     return undefined;
@@ -129,7 +159,8 @@ function sanitizeSettings(raw, base) {
   if (VALID_VALUES.lang.includes(raw.lang)) out.lang = raw.lang;
   if (typeof raw.footer === 'boolean') out.footer = raw.footer;
   if (typeof raw.reminder === 'boolean') out.reminder = raw.reminder;
-  if (VALID_VALUES.reminderMinutes.includes(raw.reminderMinutes)) out.reminderMinutes = raw.reminderMinutes;
+  if (VALID_VALUES.reminderMinutes.includes(raw.reminderMinutes))
+    out.reminderMinutes = raw.reminderMinutes;
   if (VALID_VALUES.scope.includes(raw.scope)) out.scope = raw.scope;
   return out;
 }
@@ -160,9 +191,10 @@ async function currentRules(now) {
 
   const overrides = await readJsonSafe(CONFIG_FILE());
   const cached = await readJsonSafe(CACHE_FILE());
-  const url = overrides !== null && typeof overrides === 'object' && typeof overrides.url === 'string'
-    ? overrides.url
-    : null;
+  const url =
+    overrides !== null && typeof overrides === 'object' && typeof overrides.url === 'string'
+      ? overrides.url
+      : null;
 
   let remoteDates = null;
   let source = 'builtin';
@@ -176,7 +208,11 @@ async function currentRules(now) {
       const body = await response.json();
       remoteDates = normalizeDateList(body.dates ?? body.holidays);
       source = 'builtin+remote';
-      await writeFile(CACHE_FILE(), JSON.stringify({ url, fetchedAt: now, dates: remoteDates }), 'utf8').catch(() => {});
+      await writeFile(
+        CACHE_FILE(),
+        JSON.stringify({ url, fetchedAt: now, dates: remoteDates }),
+        'utf8',
+      ).catch(() => {});
     } catch {
       remoteDates = Array.isArray(cached?.dates) ? normalizeDateList(cached.dates) : null;
       if (remoteDates !== null) source = 'builtin+cache';
@@ -227,8 +263,10 @@ async function ledgerFor(ctx, cwd, now, rules, wanted, scope) {
   }
 
   try {
+    /** @type {Array<{ kind: string, from?: number, values?: string[] }>} */
     const filters = [{ kind: 'created-at', from: week }];
-    if (!allWorkspaces && typeof cwd === 'string' && cwd !== '') filters.push({ kind: 'cwd', values: [cwd] });
+    if (!allWorkspaces && typeof cwd === 'string' && cwd !== '')
+      filters.push({ kind: 'cwd', values: [cwd] });
     const records = await query.filterSessions(filters);
     const sessionIds = selectLedgerSessions(records, allWorkspaces ? null : cwd);
     if (sessionIds.length === 0 && !allWorkspaces) return { ledger: null, missing: 'cwd' };
@@ -307,7 +345,11 @@ async function sessionCost(ctx, sessionId, now, rules) {
       cost: {
         requests: usd.requests,
         totals: { USD: usd.total + webUsd.amount, CNY: cny.total + webCny.amount },
-        web: { calls: webUsd.calls, free: webUsd.free, totals: { USD: webUsd.amount, CNY: webCny.amount } },
+        web: {
+          calls: webUsd.calls,
+          free: webUsd.free,
+          totals: { USD: webUsd.amount, CNY: webCny.amount },
+        },
         byBucket: usd.byBucket,
         byBucketCost: { USD: usd.byBucketCost, CNY: cny.byBucketCost },
         byPhase: {
@@ -322,15 +364,18 @@ async function sessionCost(ctx, sessionId, now, rules) {
         priceVersions: [...usd.priceVersions],
         capabilities: (() => {
           const caps = [...collected.capabilities];
-          const messages = collected.events.filter((event) => event && event.type === 'assistant/message').length;
+          const messages = collected.events.filter(
+            (event) => event && event.type === 'assistant/message',
+          ).length;
           if (messages > 0 && usd.requests === 0) caps.push('usage');
           return caps;
         })(),
       },
       missing: null,
-      cwd: typeof header.cwd === 'string' && header.cwd !== ''
-        ? header.cwd
-        : await sessionCwd(query, sessionId),
+      cwd:
+        typeof header.cwd === 'string' && header.cwd !== ''
+          ? header.cwd
+          : await sessionCwd(query, sessionId),
     };
   } catch {
     return { cost: null, missing: 'sessionLog', cwd: undefined };
@@ -347,7 +392,9 @@ export function apply(ctx, config) {
   const fromSettingsDocument = () => {
     try {
       const descriptors = ctx.get('settings')?.describe?.() ?? [];
-      const hit = descriptors.find((item) => item.ns === 'peak-cost' || item.ns === 'dsh-peak-cost');
+      const hit = descriptors.find(
+        (item) => item.ns === 'peak-cost' || item.ns === 'dsh-peak-cost',
+      );
       if (hit && hit.value && typeof hit.value === 'object') return hit.value;
     } catch {
       // сервис настроек недоступен
@@ -364,7 +411,10 @@ export function apply(ctx, config) {
   };
 
   const saveSettings = async (patch) => {
-    const next = sanitizeSettings({ ...(await currentSettings(Date.now())), ...(patch ?? {}) }, applied);
+    const next = sanitizeSettings(
+      { ...(await currentSettings(Date.now())), ...(patch ?? {}) },
+      applied,
+    );
     try {
       await ctx.get('settings').update('peak-cost', patch ?? {});
       saved = true;
@@ -480,4 +530,3 @@ export function apply(ctx, config) {
 }
 
 export { Config };
-
