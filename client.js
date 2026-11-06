@@ -18,7 +18,6 @@ window.__ModuleLoader__.load({
       refreshMs: 30_000,
       lang: 'auto',
       footer: false,
-      reminder: false,
     };
 
     // Размер задаёт обёртка (как официальный `anchor`), кнопка повторяет его
@@ -114,14 +113,12 @@ window.__ModuleLoader__.load({
       currencyLabel: 'Валюта в пилюле',
       refreshLabel: 'Обновление',
       footerLabel: 'Строка в футере сайдбара',
-      reminderLabel: 'Напоминание о входе в пик',
       seconds: 'с',
       calls: { one: 'вызов', few: 'вызова', many: 'вызовов' },
       langLabel: 'Язык плагина',
       langAuto: 'Как в Harness',
       langRu: 'Русский',
       langEn: 'English',
-      peakStarted: 'Пик начался',
       footerPeak: 'Пик',
       footerOff: 'Вне пика',
       caps: 'Нет доступа к',
@@ -174,14 +171,12 @@ window.__ModuleLoader__.load({
       currencyLabel: 'Pill currency',
       refreshLabel: 'Refresh',
       footerLabel: 'Sidebar footer row',
-      reminderLabel: 'Remind me when peak starts',
       seconds: 's',
       calls: { one: 'call', few: 'calls', many: 'calls' },
       langLabel: 'Plugin language',
       langAuto: 'Follow Harness',
       langRu: 'Русский',
       langEn: 'English',
-      peakStarted: 'Peak started',
       footerPeak: 'Peak',
       footerOff: 'Off-peak',
       caps: 'Unavailable',
@@ -669,15 +664,6 @@ window.__ModuleLoader__.load({
             onChange: (event) => onWrite({ footer: event.target.checked }),
           }),
         ),
-        h(
-          SettingsRow,
-          { label: w.reminderLabel },
-          h('input', {
-            type: 'checkbox',
-            checked: settings.reminder,
-            onChange: (event) => onWrite({ reminder: event.target.checked }),
-          }),
-        ),
       );
     }
 
@@ -782,35 +768,8 @@ window.__ModuleLoader__.load({
       const [failed, setFailed] = React.useState(false);
       const [nowMs, setNowMs] = React.useState(() => Date.now());
       const [open, setOpen] = React.useState(false);
-      const [notice, setNotice] = React.useState(false);
-      const prevPhase = React.useRef(null);
       const settings = (state && state.settings) || DEFAULT_SETTINGS;
 
-      React.useEffect(() => {
-        const phase = state && state.phase;
-        if (phase !== 'peak' && phase !== 'off-peak') return undefined;
-        prevPhase.current = phase;
-
-        if (!settings.reminder || phase !== 'peak') {
-          setNotice(false);
-          return undefined;
-        }
-
-        setNotice(true);
-        const hide = setTimeout(() => setNotice(false), 60_000);
-        const repeat = setInterval(
-          () => {
-            setNotice(true);
-            setTimeout(() => setNotice(false), 60_000);
-          },
-          Math.max(1, settings.reminderMinutes ?? 30) * 60_000,
-        );
-
-        return () => {
-          clearTimeout(hide);
-          clearInterval(repeat);
-        };
-      }, [state && state.phase, settings.reminder, settings.reminderMinutes]);
       const [pos, setPos] = React.useState(null);
       const rootRef = React.useRef(null);
       const panelRef = React.useRef(null);
@@ -924,13 +883,6 @@ window.__ModuleLoader__.load({
             },
             h('span', { 'aria-hidden': true, style: { ...DOT_STYLE, background: colour } }),
             h('span', null, label),
-            notice
-              ? h(
-                  'span',
-                  { style: { color: 'var(--dsw-alias-state-warn-primary)' } },
-                  `· ${w.peakStarted}`,
-                )
-              : null,
             countdown
               ? h(
                   React.Fragment,

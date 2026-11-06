@@ -84,16 +84,6 @@ function buildConfigSchema() {
         .default(false)
         .volatile()
         .description('Строка в футере сайдбара'),
-      reminder: schemaBuilder
-        .boolean()
-        .default(false)
-        .volatile()
-        .description('Напоминание о входе в пик'),
-      reminderMinutes: schemaBuilder
-        .number()
-        .default(30)
-        .volatile()
-        .description('Интервал напоминаний в пике, мин'),
       scope: schemaBuilder
         .union(['workspace', 'all'])
         .default('workspace')
@@ -120,8 +110,6 @@ const SETTINGS_DEFAULTS = Object.freeze({
   refreshMs: 30000,
   lang: 'auto',
   footer: false,
-  reminder: false,
-  reminderMinutes: 30,
   scope: 'workspace',
 });
 
@@ -143,7 +131,6 @@ const VALID_VALUES = {
   currency: ['USD', 'CNY'],
   refreshMs: [15000, 30000, 60000],
   lang: ['auto', 'ru', 'en'],
-  reminderMinutes: [5, 15, 30, 60, 120],
   scope: ['workspace', 'all'],
 };
 
@@ -158,9 +145,6 @@ function sanitizeSettings(raw, base) {
   if (VALID_VALUES.refreshMs.includes(raw.refreshMs)) out.refreshMs = raw.refreshMs;
   if (VALID_VALUES.lang.includes(raw.lang)) out.lang = raw.lang;
   if (typeof raw.footer === 'boolean') out.footer = raw.footer;
-  if (typeof raw.reminder === 'boolean') out.reminder = raw.reminder;
-  if (VALID_VALUES.reminderMinutes.includes(raw.reminderMinutes))
-    out.reminderMinutes = raw.reminderMinutes;
   if (VALID_VALUES.scope.includes(raw.scope)) out.scope = raw.scope;
   return out;
 }
