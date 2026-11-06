@@ -49,6 +49,20 @@ No API keys. No network calls apart from an optional holiday-calendar refresh fr
 - The price table and holiday calendar ship with the plugin; requests before 2026-09-10 are flagged as unpriceable rather than priced by guesswork.
 - With a `link:` install, file edits are not picked up by hot reload; the composition has to be recomposed (see ADR 0005).
 
+## Development
+
+```sh
+npm ci
+npm test            # чистые функции: календарь, цены, свёртка, web-сборы, леджер
+npm run typecheck   # tsc по JSDoc
+npm run build       # dist/*.tgz с проверкой состава пакета
+npm run dev:reload  # перезагрузить плагин в запущенном Harness через CDP
+```
+
+Как устроен цикл разработки, почему горячая замена не работает при `link:`-установке и что
+нужно в профиле — [docs/DEV.md](docs/DEV.md). Карта проекта для агентов —
+[AGENTS.md](AGENTS.md). Решения и их причины — [docs/adr](docs/adr).
+
 ---
 
 # dsh-peak-cost (по-русски)

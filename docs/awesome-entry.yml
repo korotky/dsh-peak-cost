@@ -1,0 +1,5 @@
+url: https://github.com/korotky/dsh-peak-cost
+name: korotky/dsh-peak-cost
+category: usage
+description:
+  en: Peak/off-peak billing period, countdown and per-session cost estimate in the composer statistics row, pricing each request at its own moment.
